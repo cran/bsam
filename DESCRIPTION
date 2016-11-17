@@ -1,7 +1,7 @@
 Package: bsam
 Type: Package
 Title: Bayesian State-Space Models for Animal Movement
-Version: 1.1.0
+Version: 1.1.1
 Authors@R: c(
     person("Ian", "Jonsen", email = "ian.jonsen@mq.edu.au", 
     role = c("aut", "cre")),
@@ -27,11 +27,11 @@ BugReports: https://github.com/ianjonsen/bsam/issues
 LazyData: yes
 RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2016-11-01 02:18:11 UTC; jonsen
+Packaged: 2016-11-17 09:21:42 UTC; jonsen
 Author: Ian Jonsen [aut, cre],
   Sophie Bestley [ctb],
   Simon Wotherspoon [ctb],
   Michael Sumner [ctb]
 Maintainer: Ian Jonsen <ian.jonsen@mq.edu.au>
 Repository: CRAN
-Date/Publication: 2016-11-01 11:07:27
+Date/Publication: 2016-11-17 14:34:35

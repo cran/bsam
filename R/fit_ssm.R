@@ -100,7 +100,6 @@ fit_ssm <- function (data, model = "DCRW", tstep = 1, adapt = 10000, samples = 5
   model.file <- file.path(system.file(package = "bsam"), "jags", paste(model, ".txt", sep = ""))
     
 	options(warn = -1)	    	
-  seed <- sample(1:1e+05, 1)
   st <- proc.time()
   
   ## assign temporary ordered id's so animal id order is preserved in all cases
@@ -117,19 +116,23 @@ fit_ssm <- function (data, model = "DCRW", tstep = 1, adapt = 10000, samples = 5
 	  ## reassign original animal id's
 	  fit <- lapply(1:length(fit), function(i) {
 	    fit[[i]]$summary$id <- unique(id)[i]
+	    fit[[i]]$data$id <- unique(id)[i]
 	    fit[[i]]
 	  })
 	  names(fit) <- unique(id)
+	  class(fit) <- "ssm"
 	}
 	else {
 	  fit <- hssm(d, model = model, adapt = adapt, samples = samples, thin = thin, 
 	              chains = 2, span = span)
 	  
 	  ## reassign original animal id's
-	  fit$summary$id <- factor(fit$summary$id, labels = unique(id))
+	  fit$summary$id <- factor(as.numeric(fit$summary$id), labels = unique(id))
+	  fit$data$id <- factor(as.numeric(fit$data$id), labels = unique(id))
+	  class(fit) <- "hssm"
 	}
 	
-	cat("Elapsed time: ", round((proc.time() - st)[3]/60,2), "min \n")	
+	cat("Elapsed time: ", round((proc.time() - st)[3] / 60, 2), "min \n")	
 	options(warn = 0)
 
 	fit
