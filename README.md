@@ -1,8 +1,10 @@
 # bsam
 
+[![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![Build Status](https://travis-ci.org/ianjonsen/bsam.svg?branch=master)](https://travis-ci.org/ianjonsen/bsam)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/bsam)](https://cran.r-project.org/package=bsam)
 [![CRAN_Downloads](http://cranlogs.r-pkg.org/badges/bsam)](http://www.r-pkg.org/pkg/bsam)
+[![CRAN_Downloads](http://cranlogs.r-pkg.org/badges/grand-total/bsam)](http://r-pkg.org/pkg/bsam)
 
 **bsam** - **B**ayesian **S**tate-space models for **A**nimal **M**ovement. 
 

@@ -14,6 +14,7 @@
 #' summary \code{data.frame} of mean and median position estimates.
 #' @seealso Function to be called by \code{\link{fit_ssm}}.
 #' @importFrom rjags jags.samples jags.model
+#' @importFrom lubridate as_datetime
 #' @importFrom msm rtnorm
 #' @importFrom tibble data_frame as_data_frame
 #' @export
@@ -45,10 +46,13 @@ hssm  <-
           na.action = "na.exclude",
           control = loess.control(surface = "direct")
         )
+      
       ## Predict track, increments and stochastic innovations
       xs <-
         cbind(predict(fit.lon, newdata = data.frame(date = as.numeric(dd$ts))),
               predict(fit.lat, newdata = data.frame(date = as.numeric(dd$ts))))
+      
+      if(dim(xs)[1] < 4) stop("\n\nCannot calculate initial values; \n  deployment length and time step imply too few states\n\n")
       ds <- xs[-1,] - xs[-nrow(xs),]
       es <- ds[-1,] - gamma * ds[-nrow(ds),]
       
@@ -163,12 +167,11 @@ hssm  <-
     
     ## params
     params <- c("Sigma", "x", "gamma", "psi")
-    if (model == "hDCRWS")
-      params <- c(params, "alpha", "b")
-    
+    if (model == "hDCRWS") { params <- c(params, "alpha", "b") }
+
     model.file <-
       paste(system.file('jags', package = 'bsam'), "/", model, ".txt", sep = "")
-    
+        
     burn <-
       jags.model(model.file,
                         data,
@@ -186,14 +189,14 @@ hssm  <-
     lat.q = apply(psamples$x[, 2, ,], 1, quantile, c(0.025, 0.5, 0.975))
    
     dts <-
-      as.POSIXct(unlist(sapply(prep, function(x)
-        x$ts)), origin = "1970-01-01", tz = "GMT")
+      unlist(lapply(prep, function(x)
+        x$ts))
     id  <- rep(as.character(sapply(prep, function(x)
       x$id)), Nx)
    
     summary <- data_frame(
       id = id,
-      date = dts,
+      date = as_datetime(dts, tz = "GMT"),
       lon,
       lat,
       lon.025 = lon.q[1, ],
