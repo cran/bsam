@@ -13,10 +13,10 @@
 #' @return Returns a list of McMC samples from marginal posteriors and a
 #' summary \code{data.frame} of mean and median position estimates.
 #' @seealso Function to be called by \code{\link{fit_ssm}}.
-#' @importFrom rjags jags.samples jags.model
+#' @importFrom rjags jags.samples jags.model list.modules load.module
 #' @importFrom lubridate as_datetime
 #' @importFrom msm rtnorm
-#' @importFrom tibble data_frame as_data_frame
+#' @importFrom tibble tibble as_tibble
 #' @export
 hssm  <-
   function (d,
@@ -138,13 +138,17 @@ hssm  <-
       x <-
         cbind(rnorm(nrow(xs), xs[, 1], 0.1), rnorm(nrow(xs), xs[, 2], 0.1))
       b <- rbinom(nrow(xs), 1, 0.5) + 1
+      deviance <- rnorm(1)
+      pD <- runif(1, 1000)
       
       init <-
         list(
           iSigma = iSigma,
           gamma = gamma[1],
           logpsi = logpsi,
-          x = x
+          x = x,
+          deviance = deviance,
+          pD = pD
         )
       if (model == "hDCRWS") {
         init <-
@@ -156,7 +160,9 @@ hssm  <-
             lambda = lambda,
             logpsi = logpsi,
             x = x,
-            b = b
+            b = b,
+            deviance = deviance,
+            pD = pD
           )
       }
       init
@@ -166,12 +172,19 @@ hssm  <-
         init.fn(isigma2, rho, xs, N))
     
     ## params
-    params <- c("Sigma", "x", "gamma", "psi")
+    params <- c("Sigma", "x", "gamma", "psi", "deviance", "pD")
     if (model == "hDCRWS") { params <- c(params, "alpha", "b") }
 
     model.file <-
       paste(system.file('jags', package = 'bsam'), "/", model, ".txt", sep = "")
-        
+    
+    ## load DIC module in JAGS, if not already loaded
+    ## this ensures deviance chains are monitored
+    mods <- list.modules()
+    if(!"dic" %in% mods) {
+      load.module("dic")
+    }
+    
     burn <-
       jags.model(model.file,
                         data,
@@ -194,7 +207,7 @@ hssm  <-
     id  <- rep(as.character(sapply(prep, function(x)
       x$id)), Nx)
    
-    summary <- data_frame(
+    summary <- tibble(
       id = id,
       date = as_datetime(dts, tz = "GMT"),
       lon,
@@ -219,7 +232,7 @@ hssm  <-
     if (model == "hDCRWS") {
       b <- apply(psamples$b, 1, mean)
       b.5 <- apply(psamples$b, 1, median)
-      summary <- as_data_frame(cbind(summary, b = b, b.5 = b.5))
+      summary <- as_tibble(cbind(summary, b = b, b.5 = b.5))
     }
     list(
       summary = summary,

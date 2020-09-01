@@ -29,10 +29,11 @@ state estimates compared to fitting DCRW/DCRWS to individual datasets.
 }
 \examples{
 \dontrun{
-# Fit DCRW model for state filtering and regularization
-data(ellie)
-fit <- fit_ssm(ellie, model = "DCRW", tstep = 1, adapt = 5000, samples = 5000, 
-              thin = 5, span = 0.2)
+# Fit DCRW model for state filtering and regularization -
+# using trivial adapt & samples values for speed
+data(ellie1)
+fit <- fit_ssm(ellie1, model = "DCRW", tstep = 1, adapt = 10, samples = 100, 
+              thin = 1, span = 0.2)
 diag_ssm(fit)
 map_ssm(fit)
 plot_fit(fit)
